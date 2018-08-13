@@ -3,6 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 import math
 import random
+import sys
 import image_utils
 
 def init_random_square(size, length):
@@ -19,7 +20,7 @@ def init_random_square(size, length):
 
     return img, degree
 
-def main():
+def test_random():
     square, ori_angle = init_random_square(256, 60)
     square = image_utils.add_random_noise(square, 30)
 
@@ -58,6 +59,51 @@ def main():
     plt.subplot(122), plt.imshow(mag_spec, cmap='gray')
     plt.show()
 
+def test_real():
+    square = cv.imread(sys.argv[1], 0)
+    print(np.mean(square))
+    square = square - np.mean(square)
+    img_height, img_width = square.shape
+   # print(square.shape)
+   # nh = int(math.pow(2, int(math.log(img_height, 2))))
+   # nw = int(math.pow(2, int(math.log(img_width, 2))))
+   # square = square[0:nh, 0:nw]
+   # img_height, img_width = square.shape
+   # print(square.shape)
+
+    fimg = np.fft.fft2(square)
+    fshift = np.fft.fftshift(fimg)
+    mag_spec = np.log(np.abs(fshift))
+
+    mag_spec[int(img_height/2*0.9):int(img_height/2*1.1), int(img_width/2*0.9):int(img_width/2*1.1)] = 0
+    top_num =5
+    max_x_stack = np.zeros(top_num).astype(np.int)
+    max_y_stack = np.zeros(top_num).astype(np.int)
+    i = 0
+    min_mag = np.min(mag_spec)
+    print(np.max(mag_spec))
+    print(np.min(mag_spec))
+    while i < top_num:
+        max_y, max_x = np.where(mag_spec == np.max(mag_spec))
+        for j in range(len(max_x)):
+            if i + j > top_num - 1:
+                break
+            max_x_stack[i+j] = max_x[j]
+            max_y_stack[i+j] = max_y[j]
+            mag_spec[max_y[j]][max_x[j]] = min_mag
+        i = i + len(max_x)
+
+    i = 0
+    for i in range(top_num):
+        cv.line(square, (max_x_stack[i], max_y_stack[i]), (img_width - max_x_stack[i], img_height - max_y_stack[i]), (255, 0, 0), 2)
+        angle = -math.atan2((max_y_stack[i] - img_height/2), (max_x_stack[i] - img_width/2)) / math.pi * 180
+        print('Angle: {}'.format(angle))
+
+    plt.subplot(121), plt.imshow(square, cmap='gray')
+    plt.subplot(122), plt.imshow(mag_spec, cmap='gray')
+    plt.show()
+
 if __name__ == '__main__':
-    for i in range(10):
-        main()
+#    for i in range(10):
+#        test_random()
+     test_real()
