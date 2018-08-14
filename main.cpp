@@ -8,10 +8,11 @@ using namespace std;
 
 int main() {
     cv::Mat img = cv::imread("../1.jpg", 0);
-    cout << img.rows << ' ' << img.cols << endl;
-    cout << img.step << endl;
 
-    HoughLines HoughDetector(img, 20, 1, 1/180*CV_PI);
+    cv::InputArray src_img(img);
+    cout << "start detecting" << endl;
+    HoughLines HoughDetector(src_img, 20, 1, 1./180.*CV_PI);
+    cout << "getting lines" << endl;
     vector<HoughLines::PolarLine> lines = HoughDetector.getLines(5);
 
     for (int i = 0; i < 5; i++) {

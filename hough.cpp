@@ -5,7 +5,8 @@ using namespace std;
 
 #include "hough.hpp"
 
-HoughLines::HoughLines(cv::Mat& img, int threshold, float rho, float theta, float minTheta, float maxTheta) {
+HoughLines::HoughLines(cv::InputArray src_img, int threshold, float rho, float theta, float minTheta, float maxTheta) {
+    cv::Mat img = src_img.getMat();
     threshold_ = threshold;
     thetaStep_ = theta;
     rhoStep_ = rho;
@@ -15,7 +16,7 @@ HoughLines::HoughLines(cv::Mat& img, int threshold, float rho, float theta, floa
     maxRho_ = img.rows + img.cols;
     minRho_ = -1 * maxRho_;
     numRho_ = cvRound((maxRho_ - minRho_ + 1) / rhoStep_);
-    accumTable_ = cv::Mat::zeros(numTheta_ + 2, numRho_ + 2, CV_32SC1);  // 
+    accumTable_ = cv::Mat::zeros(numTheta_ + 2, numRho_ + 2, CV_32SC1);
 
     createTrigTable();
     initAccumTable(img);
@@ -49,8 +50,8 @@ void HoughLines::initAccumTable(cv::Mat& img) {
 void HoughLines::createTrigTable() {
     float ang = minTheta_;
     for (int n = 0; n < numTheta_; ang += thetaStep_, n++) {
-        sinTab_[n] = sin(ang)/rhoStep_;
-        cosTab_[n] = cos(ang)/rhoStep_;
+        sinTab_.push_back(sin(ang)/rhoStep_);
+        cosTab_.push_back(cos(ang)/rhoStep_);
     }
 }
 
