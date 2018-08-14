@@ -18,7 +18,7 @@ HoughLines::HoughLines(cv::Mat& img, int threshold, float rho, float theta, floa
     accumTable_ = cv::Mat::zeros(numTheta_ + 2, numRho_ + 2, CV_32SC1);  // 
 
     createTrigTable();
-    initAccumTable();
+    initAccumTable(img);
 
     findLocalMax();
 
