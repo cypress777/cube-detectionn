@@ -6,14 +6,13 @@ using namespace std;
 #include "hough.hpp"
 
 HoughLines::HoughLines(cv::Mat& img, int threshold, float rho, float theta, float minTheta, float maxTheta) {
-    img_ = img;
     threshold_ = threshold;
     thetaStep_ = theta;
     rhoStep_ = rho;
     minTheta_ = minTheta;
     maxTheta_ = maxTheta;
     numTheta_ = cvRound((maxTheta_ - minTheta_) / thetaStep_);
-    maxRho_ = img_.rows + img_.cols;
+    maxRho_ = img.rows + img.cols;
     minRho_ = -1 * maxRho_;
     numRho_ = cvRound((maxRho_ - minRho_ + 1) / rhoStep_);
     accumTable_ = cv::Mat::zeros(numTheta_ + 2, numRho_ + 2, CV_32SC1);  // 
@@ -21,18 +20,18 @@ HoughLines::HoughLines(cv::Mat& img, int threshold, float rho, float theta, floa
     createTrigTable();
     initAccumTable();
 
-    findLocalMax()
+    findLocalMax();
 
     const int *accum = accumTable_.ptr<int>();
     sort(sortBuf_.begin, sortBuf_.end, hough_cmp_gt(accum));
 }
 
-void HoughLines::initAccumTable() {
-    const uchar *image = img_.ptr();
+void HoughLines::initAccumTable(cv::Mat& img) {
+    const uchar *image = img.ptr();
     int *accum = accumTable_.ptr<int>();
-    int step = (int)img_.step;
-    int width = img_.cols;
-    int height = img_.rows;
+    int step = (int)img.step;
+    int width = img.cols;
+    int height = img.rows;
 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {

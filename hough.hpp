@@ -28,7 +28,6 @@ private:
         const int* aux;
     };
 
-    const cv::Mat img_;
     int threshold_;
     float thetaStep_;
     float rhoStep_;
@@ -44,7 +43,7 @@ private:
     vector<int> sortBuf_;
 
     void createTrigTable();
-    void initAccumTable();
+    void initAccumTable(cv::Mat& img);
     void findLocalMax();
 };
 #endif //UNTITLED_HOUGH_HPP
