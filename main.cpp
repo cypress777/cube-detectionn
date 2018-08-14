@@ -11,11 +11,11 @@ int main() {
     cout << img.rows << ' ' << img.cols << endl;
     cout << img.step << endl;
 
-    HoughLines Houghdetector(img, 20, 1, 1/180*CV_PI);
-    vector<HoughLines::PolarLine> lines = HoughLines.getLines(5);
+    HoughLines HoughDetector(img, 20, 1, 1/180*CV_PI);
+    vector<HoughLines::PolarLine> lines = HoughDetector.getLines(5);
 
     for (int i = 0; i < 5; i++) {
         cout << "deteted lines: " << endl;
-        cout << lines[i].rho << ' ' << lines[0].theta << ' ' << lines[i].cout << endl;
+        cout << lines[i].rho << ' ' << lines[0].theta << ' ' << lines[i].count << endl;
     }
 }
