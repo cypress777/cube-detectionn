@@ -5,7 +5,7 @@ using namespace std;
 
 #include "hough.hpp"
 
-HoughLines::HoughLines(const cv::Mat& img, int threshold, float rho, float theta, float minTheta, float maxTheta) {
+HoughLines::HoughLines(cv::Mat& img, int threshold, float rho, float theta, float minTheta, float maxTheta) {
     img_ = img;
     threshold_ = threshold;
     thetaStep_ = theta;
@@ -21,10 +21,10 @@ HoughLines::HoughLines(const cv::Mat& img, int threshold, float rho, float theta
     createTrigTable();
     initAccumTable();
 
-    findLocalMax(sortBuf_)
+    findLocalMax()
 
     const int *accum = accumTable_.ptr<int>();
-    sort(sortBuf_.begin, sortBuf_.end, hough_cmp_gt(accum))
+    sort(sortBuf_.begin, sortBuf_.end, hough_cmp_gt(accum));
 }
 
 void HoughLines::initAccumTable() {
@@ -55,12 +55,12 @@ void HoughLines::createTrigTable() {
     }
 }
 
-void findLocalMax() {
+void HoughLines::findLocalMax() {
     const int *accum = accumTable_.ptr<int>();
-    for (r = 0; r < numRho_; r++) {
-        for (n = 0; n < numTheta_; n++) {
+    for (int r = 0; r < numRho_; r++) {
+        for (int n = 0; n < numTheta_; n++) {
             int base = (n+1) * (numRho_+2) + r + 1;
-            if( accum[base] > threshold &&
+            if( accum[base] > threshold_ &&
                 accum[base] > accum[base - 1] && accum[base] >= accum[base + 1] &&
                 accum[base] > accum[base - numRho_ - 2] && accum[base] >= accum[base + numRho_ + 2] )
                 sortBuf_.push_back(base);
@@ -76,7 +76,7 @@ vector<HoughLines::PolarLine> HoughLines::getLines(int topNum) {
     topNum = min(topNum, (int)sortBuf_.size());
     float scale = 1./(numRho_ + 2);
 
-    for (i = 0; i < topNum; i++) {
+    for (int i = 0; i < topNum; i++) {
         PolarLine line;
         int idx = sortBuf_[i];
         int n = cvFloor(idx*scale) - 1;
