@@ -85,4 +85,5 @@ vector<HoughLines::PolarLine> HoughLines::getLines(int topNum) {
         line.count = accum[idx];
         lines.push_back(line);
     }
+    return lines;
 }
