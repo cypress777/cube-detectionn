@@ -23,7 +23,7 @@ HoughLines::HoughLines(cv::Mat& img, int threshold, float rho, float theta, floa
     findLocalMax();
 
     const int *accum = accumTable_.ptr<int>();
-    sort(sortBuf_.begin, sortBuf_.end, hough_cmp_gt(accum));
+    sort(sortBuf_.begin(), sortBuf_.end(), hough_cmp_gt(accum));
 }
 
 void HoughLines::initAccumTable(cv::Mat& img) {
