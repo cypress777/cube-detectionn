@@ -13,12 +13,23 @@ public:
     struct PolarLine {
         float rho;
         float theta;
-        int accum;
+        int count;
     };
-    HoughLines(cv::Mat& img, float rho, float theta=float(1./180.*CV_PI), float min_theta=0, float max_theta=float(CV_PI));
+    HoughLines(const cv::Mat& img, int threshold, float rho=1, float theta=float(1./180.*CV_PI),
+               float min_theta=0, float max_theta=float(CV_PI));
+    vector<PolarLine> getLines(int topNum=1);
 
 private:
-    cv::Mat img_;
+    struct hough_cmp_gt {
+        hough_cmp_gt(const int* _aux) : aux(_aux) {}
+        inline bool operator()(int l1, int l2) const {
+            return aux[l1] > aux[l2] || (aux[l1] == aux[l2] && l1 < l2);
+        }
+        const int* aux;
+    };
+
+    const cv::Mat img_;
+    int threshold_;
     float thetaStep_;
     float rhoStep_;
     float minTheta_;
@@ -30,9 +41,11 @@ private:
     cv::Mat accumTable_;
     vector<float> sinTab_;
     vector<float> cosTab_;
+    vector<int> sortBuf_;
 
     void createTrigTable();
     void initAccumTable();
+    void findLocalMax();
 };
 #endif //UNTITLED_HOUGH_HPP
 

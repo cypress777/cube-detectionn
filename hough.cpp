@@ -5,8 +5,9 @@ using namespace std;
 
 #include "hough.hpp"
 
-HoughLines::HoughLines(cv::Mat& img, float rho, float theta, float minTheta, float maxTheta) {
+HoughLines::HoughLines(const cv::Mat& img, int threshold, float rho, float theta, float minTheta, float maxTheta) {
     img_ = img;
+    threshold_ = threshold;
     thetaStep_ = theta;
     rhoStep_ = rho;
     minTheta_ = minTheta;
@@ -15,10 +16,15 @@ HoughLines::HoughLines(cv::Mat& img, float rho, float theta, float minTheta, flo
     maxRho_ = img_.rows + img_.cols;
     minRho_ = -1 * maxRho_;
     numRho_ = cvRound((maxRho_ - minRho_ + 1) / rhoStep_);
-    accumTable_ = cv::Mat::zeros(numTheta_ + 2, numRho_ + 2, CV_32SC1);
+    accumTable_ = cv::Mat::zeros(numTheta_ + 2, numRho_ + 2, CV_32SC1);  // 
 
     createTrigTable();
     initAccumTable();
+
+    findLocalMax(sortBuf_)
+
+    const int *accum = accumTable_.ptr<int>();
+    sort(sortBuf_.begin, sortBuf_.end, hough_cmp_gt(accum))
 }
 
 void HoughLines::initAccumTable() {
@@ -49,3 +55,35 @@ void HoughLines::createTrigTable() {
     }
 }
 
+void findLocalMax() {
+    const int *accum = accumTable_.ptr<int>();
+    for (r = 0; r < numRho_; r++) {
+        for (n = 0; n < numTheta_; n++) {
+            int base = (n+1) * (numRho_+2) + r + 1;
+            if( accum[base] > threshold &&
+                accum[base] > accum[base - 1] && accum[base] >= accum[base + 1] &&
+                accum[base] > accum[base - numRho_ - 2] && accum[base] >= accum[base + numRho_ + 2] )
+                sortBuf_.push_back(base);
+        }
+    }
+}
+
+
+vector<HoughLines::PolarLine> HoughLines::getLines(int topNum) {
+    vector<HoughLines::PolarLine> lines;
+    const int *accum = accumTable_.ptr<int>();
+
+    topNum = min(topNum, (int)sortBuf_.size());
+    float scale = 1./(numRho_ + 2);
+
+    for (i = 0; i < topNum; i++) {
+        PolarLine line;
+        int idx = sortBuf_[i];
+        int n = cvFloor(idx*scale) - 1;
+        int r = idx - (n+1)*(numRho_+2) - 1;
+        line.rho = (r - (numRho_ - 1)*0.5f) * rhoStep_;
+        line.theta = minTheta_ + n*thetaStep_;
+        line.count = accum[idx];
+        lines.push_back(line);
+    }
+}
