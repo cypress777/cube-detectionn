@@ -3,7 +3,7 @@
 //
 using namespace std;
 
-#include "hough.hpp"
+#include "Hough.hpp"
 
 HoughLines::HoughLines(const cv::Mat& img, int threshold, float rho, float theta, float minTheta, float maxTheta) {
     threshold_ = threshold;
