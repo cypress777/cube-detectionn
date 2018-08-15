@@ -9,6 +9,6 @@ find_package(OpenCV REQUIRED)
 
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-add_executable(houghtransform hough.cpp hough.hpp main.cpp)
+add_executable(houghtransform Hough.cpp Hough.hpp main.cpp)
 target_link_libraries(houghtransform ${OpenCV_LIBS})
 
