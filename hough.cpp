@@ -5,8 +5,7 @@ using namespace std;
 
 #include "hough.hpp"
 
-HoughLines::HoughLines(cv::InputArray src_img, int threshold, float rho, float theta, float minTheta, float maxTheta) {
-    cv::Mat img = src_img.getMat();
+HoughLines::HoughLines(const cv::Mat& img, int threshold, float rho, float theta, float minTheta, float maxTheta) {
     threshold_ = threshold;
     thetaStep_ = theta;
     rhoStep_ = rho;
@@ -27,7 +26,7 @@ HoughLines::HoughLines(cv::InputArray src_img, int threshold, float rho, float t
     sort(sortBuf_.begin(), sortBuf_.end(), hough_cmp_gt(accum));
 }
 
-void HoughLines::initAccumTable(cv::Mat& img) {
+void HoughLines::initAccumTable(const cv::Mat& img) {
     const uchar *image = img.ptr();
     int *accum = accumTable_.ptr<int>();
     int step = (int)img.step;

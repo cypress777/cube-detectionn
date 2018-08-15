@@ -15,7 +15,7 @@ public:
         float theta;
         int count;
     };
-    HoughLines(cv::InputArray src_img, int threshold, float rho=1, float theta=float(1./180.*CV_PI),
+    HoughLines(const cv::Mat& img, int threshold, float rho=1, float theta=float(1./180.*CV_PI),
                float min_theta=0, float max_theta=float(CV_PI));
     vector<PolarLine> getLines(int topNum=1);
 
@@ -43,7 +43,7 @@ private:
     vector<int> sortBuf_;
 
     void createTrigTable();
-    void initAccumTable(cv::Mat& img);
+    void initAccumTable(const cv::Mat& img);
     void findLocalMax();
 };
 #endif //UNTITLED_HOUGH_HPP
